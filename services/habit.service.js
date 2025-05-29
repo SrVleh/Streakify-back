@@ -2,7 +2,7 @@ import mongoose, { isValidObjectId } from 'mongoose'
 
 import { HabitModel } from '../models/habit.model.js'
 import { AppError } from "../utils/app.error.js";
-import {HabitHistory} from "../models/habitHistory.model.js";
+import {HabitHistory} from "../models/habit-history.model.js";
 
 const ObjectId = mongoose.Types.ObjectId
 
