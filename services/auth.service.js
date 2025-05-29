@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { SALT_ROUNDS } from "../config.js";
-import { User } from "../models/user.js";
+import { UserModel } from "../models/user.model.js";
+import { AppError } from "../utils/app.error.js";
 
 export class AuthService {
   static async create({ input }) {
@@ -10,13 +11,13 @@ export class AuthService {
     } = input
 
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS)
-    const user = new User({username: username, password: hashedPassword})
+    const user = new UserModel({username: username, password: hashedPassword})
 
     try {
       await user.validate()
       await user.save()
     } catch (error) {
-      throw new Error('Failed creating new user.')
+      throw new AppError('Failed creating new user', 422)
     }
 
     return user.id
@@ -28,12 +29,15 @@ export class AuthService {
       password
     } = input
 
-    const user = await User.findOne({username: username})
-    if (!user) throw new Error('User not found.')
+    const user = await UserModel.findOne({username: username})
+    if (!user) throw new AppError('User not found', 404)
     const isValid = bcrypt.compareSync(password, user.password)
-    if (!isValid) throw new Error('Wrong credentials')
+    if (!isValid) throw new AppError('Wrong credentials', 404)
 
-    const { password: _, ...publicUser } = user
+    const publicUser = {
+      _id: user._id,
+      username: user.username,
+    }
 
     return publicUser
   }
