@@ -17,7 +17,7 @@ export class HabitService {
   static async getById({ habitId, userId }) {
     await updateHabitsStates(userId)
     if (!isValidObjectId(habitId)) return null
-    const habit = HabitModel.findOne({ _id: new ObjectId(habitId), user: userId })
+    const habit = await HabitModel.findOne({ _id: new ObjectId(habitId), user: userId })
     if (!habit) return new AppError('Habit not found', 404)
     return habit
   }
@@ -56,7 +56,8 @@ export class HabitService {
 
     const updateData = {
       completed: true,
-      lastCompleted: new Date()
+      lastCompleted: new Date(),
+      streak: calculateStreak(habit),
     }
 
     const habitHistoryTemplate = new HabitHistory({
@@ -142,6 +143,24 @@ const updateHabitsStates = async (userId) => {
         }
       );
     }
+  }
+}
+
+const calculateStreak = (habit) => {
+  const lastCompleted = habit.lastCompleted
+  const today = new Date()
+  const yesterday = new Date(today)
+  yesterday.setDate(today.getDate() - 1)
+
+
+  if (
+    lastCompleted.getDate() === yesterday.getDate() &&
+    lastCompleted.getMonth() === yesterday.getMonth() &&
+    lastCompleted.getFullYear() === yesterday.getFullYear()
+  ) {
+    return habit.streak + 1
+  } else {
+    return 0
   }
 }
 
