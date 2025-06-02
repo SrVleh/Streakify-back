@@ -13,9 +13,11 @@ import { JWT_SECRET } from "./config.js"
 import { SchemaValidator } from "./middlewares/schema-validator.js";
 import { habitValidatorSchema } from "./validators/habit.validator.js";
 import { userValidatorSchema } from "./validators/user.validator.js";
+import { corsMiddleware } from "./middlewares/cors.js";
 
 const app = express()
 app.set('view engine', 'ejs')
+app.use(corsMiddleware())
 app.use(express.json())
 app.use(cookieParser())
 
