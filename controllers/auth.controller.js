@@ -63,8 +63,10 @@ export class AuthController {
 
       const decoded = jwt.verify(token, JWT_SECRET);
 
+      console.log("decoded", decoded);
+
       const newAccessToken = createToken(
-        { _id: decoded._id, username: decoded.username },
+        { _id: decoded.id, username: decoded.username },
         '1m'
       );
 
@@ -73,14 +75,14 @@ export class AuthController {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         maxAge: 60 * 60 * 1000 // 1h
-      }).send({newAccessToken })
+      }).send({ newAccessToken })
     } catch (error) {
       return next(new AppError('Invalid or expired refresh token', 403));
     }
   }
 
   currentSession = async (req, res) => {
-    res.json({ user: req.session.user })
+    await res.json({ user: req.session.user })
   }
 }
 

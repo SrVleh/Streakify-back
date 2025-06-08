@@ -2,21 +2,21 @@ import { HabitService } from '../services/habit.service.js'
 
 export class HabitController {
   getAll = async (req, res) => {
-    const { id } = req.user
+    const id = req.session.user.id
     const habits = await HabitService.getAll({ userId: id })
     res.json(habits)
   }
 
   getById = async (req, res) => {
-    const { id } = req.params
-    const userId = req.user.id
-    const habit = await HabitService.getById({ habitId: id, userId: userId })
+    const { id: habitId } = req.params
+    const userId = req.session.user.id
+    const habit = await HabitService.getById({ habitId: habitId, userId: userId })
     res.json(habit)
   }
 
   getHistory = async (req, res) => {
     const { id } = req.params
-    const userId = req.user.id
+    const userId = req.session.user.id
     const habitRecords = await HabitService.getHistory({ habitId: id, userId: userId })
     res.json(habitRecords)
   }
@@ -28,7 +28,7 @@ export class HabitController {
 
   complete = async (req, res) => {
     const { id } = req.params
-    const habit = await HabitService.complete({ id: id, userId: req.user.id })
+    const habit = await HabitService.complete({ id: id, userId: req.session.user.id })
     res.json(habit)
   }
 
@@ -40,7 +40,7 @@ export class HabitController {
 
   delete = async (req, res) => {
     const { id } = req.params
-    const result = await HabitService.delete({ id: id, userId: req.user.id })
+    const result = await HabitService.delete({ id: id, userId: req.session.user.id })
     if (result.deletedCount === 0) return res.status(404).json({ error: 'Habit not found.' })
     res.json({ message: 'Habit deleted successfully!' })
   }
