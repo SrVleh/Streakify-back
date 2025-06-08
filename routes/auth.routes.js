@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { AuthController } from "../controllers/auth.controller.js";
+import { authenticateJWT } from "../middlewares/authenticate.js"
 
 export const createAuthRouter = () => {
   const authRouter = Router()
@@ -9,6 +10,7 @@ export const createAuthRouter = () => {
   authRouter.post('/register', authController.register)
   authRouter.post('/logout', authController.logout)
   authRouter.post('/refresh', authController.refresh)
+  authRouter.get('/current-session', authenticateJWT, authController.currentSession)
 
   return authRouter
 }

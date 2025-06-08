@@ -14,6 +14,7 @@ import { SchemaValidator } from "./middlewares/schema-validator.js";
 import { habitValidatorSchema } from "./validators/habit.validator.js";
 import { userValidatorSchema } from "./validators/user.validator.js";
 import { corsMiddleware } from "./middlewares/cors.js";
+import { refreshToken } from "./middlewares/refresh-token.js";
 
 const app = express()
 app.set('view engine', 'ejs')

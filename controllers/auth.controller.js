@@ -22,14 +22,14 @@ export class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxLength: 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
       })
 
       res.cookie('access_token', accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxLength: 60 * 60 * 24000,
+        maxAge: 60000 // 1m
       }).send({ user, accessToken })
 
     } catch (error) {
@@ -38,21 +38,49 @@ export class AuthController {
   }
 
   logout = async (req, res) => {
-    res.clearCookie('access_token')
-      .json({ message: 'Logged out successfully!' })
-  }
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path: '/'
+    });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'Strict',
+      path: '/'
+    });
+    res.json({ message: 'Logged out successfully!' });
+  };
 
   refresh = async (req, res) => {
-    const token = req.cookies.refresh_token
-    if (!token) return new AppError('No refresh token provided', 401)
-
     try {
-      const user = jwt.verify(token, JWT_SECRET)
-      const newAccessToken = createAccessToken({ _id: user._id, username: user.username })
-      res.json({ accessToken: newAccessToken })
+      const token = req.cookies.refresh_token;
+
+      if (!token) {
+        return next(new AppError('No refresh token provided', 401));
+      }
+
+      const decoded = jwt.verify(token, JWT_SECRET);
+
+      const newAccessToken = createToken(
+        { _id: decoded._id, username: decoded.username },
+        '1m'
+      );
+
+      res.cookie('access_token', newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 1000 // 1h
+      }).send({newAccessToken })
     } catch (error) {
-      return new AppError('Invalid refresh token', 403)
+      return next(new AppError('Invalid or expired refresh token', 403));
     }
+  }
+
+  currentSession = async (req, res) => {
+    res.json({ user: req.session.user })
   }
 }
 

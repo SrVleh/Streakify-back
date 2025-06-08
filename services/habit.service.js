@@ -147,11 +147,11 @@ const updateHabitsStates = async (userId) => {
 }
 
 const calculateStreak = (habit) => {
-  const lastCompleted = habit.lastCompleted
+  if (habit.lastCompleted === null) return 1
   const today = new Date()
+  const lastCompleted = habit.lastCompleted
   const yesterday = new Date(today)
   yesterday.setDate(today.getDate() - 1)
-
 
   if (
     lastCompleted.getDate() === yesterday.getDate() &&
@@ -160,7 +160,7 @@ const calculateStreak = (habit) => {
   ) {
     return habit.streak + 1
   } else {
-    return 0
+    return 1
   }
 }
 

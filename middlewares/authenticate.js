@@ -10,6 +10,7 @@ export const authenticateJWT = (req, res, next) => {
     req.user = jwt.verify(token, JWT_SECRET)
     next()
   } catch (error) {
-    return res.status(403).json({ error: 'Invalid or expired token.' })
+    console.log({ error: 'Invalid or expired token.' })
+    //return res.status(403).json({ error: 'Invalid or expired token.' })
   }
 }
