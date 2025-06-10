@@ -5,7 +5,7 @@ import cors from 'cors'
 const ACCEPTED_ORIGINS = [
   'http://localhost:8080',
   'http://localhost:1234',
-  'http://localhost:5173'
+  'http://localhost:5173',
 ]
 
 // INFO: We create our middleware which is a function that recieves as arg a list of accepted origins

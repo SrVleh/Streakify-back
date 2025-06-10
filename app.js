@@ -14,7 +14,6 @@ import { SchemaValidator } from "./middlewares/schema-validator.js";
 import { habitValidatorSchema } from "./validators/habit.validator.js";
 import { userValidatorSchema } from "./validators/user.validator.js";
 import { corsMiddleware } from "./middlewares/cors.js";
-import { refreshToken } from "./middlewares/refresh-token.js";
 
 const app = express()
 app.set('view engine', 'ejs')
@@ -24,11 +23,12 @@ app.use(cookieParser())
 
 app.use((req, res, next) => {
   const token = req.cookies.access_token
+  const refreshToken = req.cookies.refresh_token
 
   req.session = { user: null }
 
   try {
-    const data = jwt.verify(token, JWT_SECRET)
+    const data = jwt.verify(token ? token : refreshToken, JWT_SECRET)
     req.session.user = data
   } catch {}
 

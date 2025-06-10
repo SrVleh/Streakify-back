@@ -53,7 +53,7 @@ export class AuthController {
     res.json({ message: 'Logged out successfully!' });
   };
 
-  refresh = async (req, res) => {
+  refresh = async (req, res, next) => {
     try {
       const token = req.cookies.refresh_token;
 
@@ -62,8 +62,6 @@ export class AuthController {
       }
 
       const decoded = jwt.verify(token, JWT_SECRET);
-
-      console.log("decoded", decoded);
 
       const newAccessToken = createToken(
         { _id: decoded.id, username: decoded.username },
@@ -74,7 +72,7 @@ export class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 60 * 60 * 1000 // 1h
+        maxAge: 60 * 60 * 1000
       }).send({ newAccessToken })
     } catch (error) {
       return next(new AppError('Invalid or expired refresh token', 403));
