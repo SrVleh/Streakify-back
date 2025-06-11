@@ -3,6 +3,7 @@ import mongoose, { isValidObjectId } from 'mongoose'
 import { HabitModel } from '../models/habit.model.js'
 import { AppError } from "../utils/app.error.js";
 import {HabitHistory} from "../models/habit-history.model.js";
+import {UserModel} from "../models/user.model.js";
 
 const ObjectId = mongoose.Types.ObjectId
 
@@ -109,6 +110,34 @@ export class HabitService {
     }
   }
 }
+
+/*const updateUserBestStreak = async ({ userId }) => {
+  await updateHabitsStates(userId)
+  const habits = await HabitModel.find({ user: userId })
+  const user = await UserModel.find({ _id: userId })
+
+  if (!habits) return new AppError('Habits not found', 404)
+
+  const updateData = {
+    bestStreak: Math.max(...habits.map(habit => habit.streak)),
+    totalStrikes: habits.reduce((acc, cur) => acc + cur),
+    updatedAt: new Date(),
+    ...user
+  }
+
+  try {
+    const updatedUser = await HabitModel.findOneAndUpdate({ _id: userId }, { $set: updateData }, {
+      new: true,
+      runValidators: true
+    })
+
+    if (!updatedUser) return new AppError('Habit not found', 404)
+
+    return updatedUser
+  } catch (error) {
+    return new AppError('Failed updating habit', 422)
+  }
+}*/
 
 const isHabitCompletable = (habit) => {
   const isNewHabit = !habit.lastCompleted
